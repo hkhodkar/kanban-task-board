@@ -2,7 +2,12 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
 
 // Stroke icons (24x24, paths taken from the Lucide icon set)
 const ICONS = {
-  board: ['M3 5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z', 'M8 7v7', 'M12 7v4', 'M16 7v9'],
+  board: [
+    'M3 5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z',
+    'M8 7v7',
+    'M12 7v4',
+    'M16 7v9',
+  ],
   plus: ['M5 12h14', 'M12 5v14'],
   x: ['M18 6 6 18', 'm6 6 12 12'],
   pencil: [
@@ -24,7 +29,12 @@ const ICONS = {
     'M14 12a1 1 0 1 0 2 0a1 1 0 1 0-2 0',
     'M14 18a1 1 0 1 0 2 0a1 1 0 1 0-2 0',
   ],
-  calendar: ['M8 2v4', 'M16 2v4', 'M3 6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z', 'M3 10h18'],
+  calendar: [
+    'M8 2v4',
+    'M16 2v4',
+    'M3 6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z',
+    'M3 10h18',
+  ],
   clock: ['M2 12a10 10 0 1 0 20 0a10 10 0 1 0-20 0', 'M12 6v6l4 2'],
   user: ['M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2', 'M8 7a4 4 0 1 0 8 0a4 4 0 1 0-8 0'],
   checklist: ['m3 17 2 2 4-4', 'm3 7 2 2 4-4', 'M13 6h8', 'M13 12h8', 'M13 18h8'],

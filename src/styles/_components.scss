@@ -257,3 +257,28 @@ input[type='date'].input {
   text-align: center;
   color: var(--text-muted);
 }
+
+// Drag and drop (preview is appended to <body>, so it needs global styles)
+
+.cdk-drag-preview {
+  box-sizing: border-box;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lg) !important;
+  transform-origin: center;
+  rotate: 2deg;
+  opacity: 0.96;
+}
+
+app-board-column.cdk-drag-preview {
+  rotate: 1deg;
+  border-radius: var(--radius);
+}
+
+.cdk-drag-animating {
+  transition: transform 0.2s cubic-bezier(0, 0, 0.2, 1);
+}
+
+body.cdk-drag-dragging-active,
+body:has(.cdk-drag-preview) {
+  cursor: grabbing;
+}

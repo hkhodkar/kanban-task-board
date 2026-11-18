@@ -1,5 +1,11 @@
 import { Card, EMPTY_FILTERS } from '../models/board.models';
-import { dueStatus, hasActiveFilters, matchesFilters, toFullIndex } from './card.utils';
+import {
+  dueStatus,
+  hasActiveFilters,
+  isDoneColumn,
+  matchesFilters,
+  toFullIndex,
+} from './card.utils';
 
 const TODAY = '2026-03-10';
 
@@ -91,5 +97,13 @@ describe('toFullIndex', () => {
   it('appends when no card of the column is visible', () => {
     expect(toFullIndex(full, [], 0)).toBe(5);
     expect(toFullIndex([], [], 0)).toBe(0);
+  });
+});
+
+describe('isDoneColumn', () => {
+  it('recognises common "done" column names', () => {
+    expect(isDoneColumn({ title: 'Done' })).toBe(true);
+    expect(isDoneColumn({ title: ' published ' })).toBe(true);
+    expect(isDoneColumn({ title: 'In progress' })).toBe(false);
   });
 });

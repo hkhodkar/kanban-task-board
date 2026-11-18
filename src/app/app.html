@@ -7,6 +7,15 @@
   <div class="header-actions">
     <button
       type="button"
+      class="btn btn-ghost btn-sm reset-btn"
+      title="Restore the demo boards"
+      (click)="resetDemo()"
+    >
+      <app-icon name="refresh" [size]="16" />
+      <span class="reset-label">Reset demo</span>
+    </button>
+    <button
+      type="button"
       class="icon-btn"
       [attr.aria-label]="theme.isDark() ? 'Switch to light mode' : 'Switch to dark mode'"
       [title]="theme.isDark() ? 'Light mode' : 'Dark mode'"
@@ -30,3 +39,6 @@
 <main class="app-main">
   <router-outlet />
 </main>
+
+<app-confirm-dialog />
+<app-toast-container />

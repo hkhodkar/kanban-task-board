@@ -1,0 +1,165 @@
+:host {
+  --column-width: 262px;
+
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.board-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px 24px;
+  padding: 20px 24px 16px;
+}
+
+.title-block {
+  min-width: 0;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 500;
+
+  &:hover {
+    color: var(--primary);
+  }
+}
+
+.title-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  h1 {
+    min-width: 0;
+    overflow: hidden;
+    font-size: 22px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+}
+
+.description {
+  margin-top: 2px;
+  color: var(--text-muted);
+}
+
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.board-scroller {
+  display: flex;
+  flex: 1;
+  align-items: flex-start;
+  gap: 12px;
+  min-height: 0;
+  padding: 4px 24px 20px;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.columns {
+  display: flex;
+  gap: 12px;
+  height: 100%;
+  align-items: flex-start;
+}
+
+app-board-column.cdk-drag-placeholder {
+  opacity: 0.35;
+}
+
+.columns.cdk-drop-list-dragging app-board-column:not(.cdk-drag-placeholder) {
+  transition: transform 0.2s cubic-bezier(0, 0, 0.2, 1);
+}
+
+.add-column {
+  flex-shrink: 0;
+  width: var(--column-width);
+}
+
+.add-column-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  height: 48px;
+  padding: 0 16px;
+  border: 1.5px dashed var(--border-strong);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text-muted);
+  font-weight: 500;
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--primary);
+    background: var(--primary-soft);
+    color: var(--primary);
+  }
+}
+
+.add-column-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  border-radius: var(--radius);
+  background: var(--column);
+}
+
+.add-column-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.not-found {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 80px 16px;
+  text-align: center;
+}
+
+@media (max-width: 640px) {
+  :host {
+    --column-width: min(84vw, 300px);
+  }
+
+  .board-header {
+    padding: 16px 16px 12px;
+  }
+
+  .title-row h1 {
+    font-size: 19px;
+  }
+
+  .board-scroller {
+    gap: 12px;
+    padding: 0 16px 16px;
+    scroll-snap-type: x mandatory;
+    scroll-padding: 0 16px;
+  }
+
+  .columns {
+    gap: 12px;
+  }
+
+  app-board-column,
+  .add-column {
+    scroll-snap-align: start;
+  }
+}

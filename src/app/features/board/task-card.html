@@ -1,0 +1,38 @@
+@if (labels().length) {
+  <div class="labels">
+    @for (label of labels(); track label.id) {
+      <span class="label-pill" [class]="'label-' + label.color">{{ label.name }}</span>
+    }
+  </div>
+}
+
+<p class="title">{{ card().title }}</p>
+
+@if (card().dueDate || progress().total || card().description || assignee()) {
+  <div class="meta">
+    @if (card().dueDate) {
+      <span class="chip due" [class]="'due-' + (status() ?? 'done')" [title]="dueTitle()">
+        <app-icon [name]="status() === 'overdue' ? 'alert' : 'calendar'" [size]="13" />
+        {{ dueLabel() }}
+      </span>
+    }
+    @if (progress().total) {
+      <span
+        class="chip"
+        [class.complete]="progress().done === progress().total"
+        [title]="progress().done + ' of ' + progress().total + ' checklist items done'"
+      >
+        <app-icon name="checklist" [size]="13" />
+        {{ progress().done }}/{{ progress().total }}
+      </span>
+    }
+    @if (card().description) {
+      <span class="chip icon-only" title="Has a description">
+        <app-icon name="text" [size]="13" />
+      </span>
+    }
+    @if (assignee(); as member) {
+      <app-avatar class="assignee" [member]="member" [size]="24" />
+    }
+  </div>
+}

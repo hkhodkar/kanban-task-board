@@ -1,0 +1,106 @@
+<div class="page">
+  <header class="page-header">
+    <div>
+      <h1>Your boards</h1>
+      <p class="subtitle">
+        {{ summaries().length }} {{ summaries().length === 1 ? 'board' : 'boards' }} ·
+        {{ totalCards() }} cards
+      </p>
+    </div>
+    <button type="button" class="btn btn-primary" (click)="openCreate()">
+      <app-icon name="plus" />
+      New board
+    </button>
+  </header>
+
+  <div class="board-grid">
+    @for (summary of summaries(); track summary.board.id) {
+      <article class="board-tile">
+        <a class="tile-link" [routerLink]="['/boards', summary.board.id]">
+          <h2>{{ summary.board.name }}</h2>
+          @if (summary.board.description) {
+            <p class="description">{{ summary.board.description }}</p>
+          }
+        </a>
+
+        <button
+          type="button"
+          class="icon-btn sm tile-menu"
+          aria-label="Board actions"
+          [cdkMenuTriggerFor]="boardMenu"
+        >
+          <app-icon name="more" />
+        </button>
+        <ng-template #boardMenu>
+          <div class="menu" cdkMenu>
+            <button
+              type="button"
+              class="menu-item"
+              cdkMenuItem
+              (cdkMenuItemTriggered)="openEdit(summary.board)"
+            >
+              <app-icon name="pencil" [size]="16" /> Rename
+            </button>
+            <button
+              type="button"
+              class="menu-item danger"
+              cdkMenuItem
+              (cdkMenuItemTriggered)="remove(summary.board)"
+            >
+              <app-icon name="trash" [size]="16" /> Delete board
+            </button>
+          </div>
+        </ng-template>
+
+        <div class="stats">
+          <span
+            ><app-icon name="columns" [size]="15" />
+            {{ summary.board.columns.length }} columns</span
+          >
+          <span><app-icon name="checklist" [size]="15" /> {{ summary.cardCount }} cards</span>
+          @if (summary.overdueCount) {
+            <span class="badge danger">{{ summary.overdueCount }} overdue</span>
+          }
+        </div>
+
+        <div class="progress-row">
+          <div
+            class="progress"
+            role="progressbar"
+            [attr.aria-valuenow]="summary.progress"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            [attr.aria-label]="summary.board.name + ' progress'"
+          >
+            <span [style.width.%]="summary.progress"></span>
+          </div>
+          <span class="progress-label">{{ summary.progress }}% done</span>
+        </div>
+
+        <footer class="tile-footer">
+          <div class="avatars">
+            @for (member of summary.members; track member.id) {
+              <app-avatar [member]="member" [size]="26" />
+            }
+          </div>
+          <a class="open-link" [routerLink]="['/boards', summary.board.id]" tabindex="-1"
+            >Open board</a
+          >
+        </footer>
+      </article>
+    }
+
+    <button type="button" class="board-tile new-tile" (click)="openCreate()">
+      <span class="new-icon"><app-icon name="plus" [size]="20" /></span>
+      Create a new board
+    </button>
+  </div>
+</div>
+
+@if (dialog()) {
+  <app-board-form-dialog
+    [board]="editingBoard()"
+    (saved)="save($event)"
+    (cancelled)="closeDialog()"
+  />
+}

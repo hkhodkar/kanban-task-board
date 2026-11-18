@@ -1,4 +1,4 @@
-import { Card, CardFilters, DueStatus } from '../models/board.models';
+import { Card, CardFilters, Column, DueStatus } from '../models/board.models';
 import { daysBetween, todayIso } from './date.utils';
 
 /** Cards due within this many days count as "due soon". */
@@ -13,6 +13,13 @@ export function dueStatus(card: Pick<Card, 'dueDate'>, today = todayIso()): DueS
   if (days === 0) return 'today';
   if (days <= DUE_SOON_DAYS) return 'soon';
   return 'later';
+}
+
+const DONE_TITLES = /^(done|complete|completed|finished|shipped|published|closed)$/i;
+
+/** Cards in a "done" column are never shown as overdue and count towards progress. */
+export function isDoneColumn(column: Pick<Column, 'title'>): boolean {
+  return DONE_TITLES.test(column.title.trim());
 }
 
 export function checklistProgress(card: Pick<Card, 'checklist'>): { done: number; total: number } {

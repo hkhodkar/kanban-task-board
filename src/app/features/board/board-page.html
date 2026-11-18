@@ -1,0 +1,143 @@
+@if (board(); as board) {
+  <header class="board-header">
+    <div class="title-block">
+      <a class="back-link" routerLink="/"><app-icon name="arrow-left" [size]="15" /> All boards</a>
+      <div class="title-row">
+        <h1>{{ board.name }}</h1>
+        <button
+          type="button"
+          class="icon-btn sm"
+          aria-label="Board actions"
+          [cdkMenuTriggerFor]="boardMenu"
+        >
+          <app-icon name="more" />
+        </button>
+        <ng-template #boardMenu>
+          <div class="menu" cdkMenu>
+            <button
+              type="button"
+              class="menu-item"
+              cdkMenuItem
+              (cdkMenuItemTriggered)="openEditBoard()"
+            >
+              <app-icon name="pencil" [size]="16" /> Edit board
+            </button>
+            <button
+              type="button"
+              class="menu-item"
+              cdkMenuItem
+              (cdkMenuItemTriggered)="openAddColumn()"
+            >
+              <app-icon name="columns" [size]="16" /> Add column
+            </button>
+            <div class="menu-divider"></div>
+            <button
+              type="button"
+              class="menu-item danger"
+              cdkMenuItem
+              (cdkMenuItemTriggered)="deleteBoard(board)"
+            >
+              <app-icon name="trash" [size]="16" /> Delete board
+            </button>
+          </div>
+        </ng-template>
+      </div>
+      @if (board.description) {
+        <p class="description">{{ board.description }}</p>
+      }
+    </div>
+
+    <div class="stats">
+      <span class="badge">{{ stats().total }} cards</span>
+      @if (stats().overdue) {
+        <span class="badge danger"
+          ><app-icon name="alert" [size]="13" /> {{ stats().overdue }} overdue</span
+        >
+      }
+      @if (stats().dueSoon) {
+        <span class="badge warning"
+          ><app-icon name="clock" [size]="13" /> {{ stats().dueSoon }} due soon</span
+        >
+      }
+    </div>
+  </header>
+
+  <div class="board-scroller" cdkScrollable>
+    <div
+      class="columns"
+      cdkDropList
+      cdkDropListOrientation="horizontal"
+      [cdkDropListData]="board.columns"
+      (cdkDropListDropped)="onColumnDrop($event)"
+    >
+      @for (column of board.columns; track column.id) {
+        <app-board-column
+          cdkDrag
+          [cdkDragData]="column"
+          [cdkDragStartDelay]="dragDelay"
+          [column]="column"
+          [cards]="visibleCards()[column.id]"
+          [labels]="board.labels"
+          [members]="members()"
+          [connectedTo]="columnIds()"
+          (cardDropped)="onCardDrop($event)"
+          (cardOpened)="openCard($event)"
+          (cardAdded)="addCard(column, $event)"
+          (renamed)="renameColumn(column, $event)"
+          (deleted)="deleteColumn(column)"
+        />
+      }
+    </div>
+
+    <div class="add-column">
+      @if (addingColumn()) {
+        <div class="add-column-form">
+          <input
+            #columnInput
+            class="input"
+            placeholder="Column name"
+            aria-label="Column name"
+            maxlength="40"
+            appAutofocus
+            (keydown)="onColumnKeydown($event, columnInput)"
+          />
+          <div class="add-column-actions">
+            <button
+              type="button"
+              class="btn btn-primary btn-sm"
+              (click)="submitColumn(columnInput)"
+            >
+              Add column
+            </button>
+            <button
+              type="button"
+              class="icon-btn sm"
+              aria-label="Cancel"
+              (click)="closeAddColumn()"
+            >
+              <app-icon name="x" [size]="16" />
+            </button>
+          </div>
+        </div>
+      } @else {
+        <button type="button" class="add-column-btn" (click)="openAddColumn()">
+          <app-icon name="plus" [size]="16" /> Add column
+        </button>
+      }
+    </div>
+  </div>
+
+  @if (editingBoard()) {
+    <app-board-form-dialog
+      [board]="board"
+      (saved)="saveBoard($event)"
+      (cancelled)="closeEditBoard()"
+    />
+  }
+} @else {
+  <div class="not-found">
+    <h1>Board not found</h1>
+    <p class="text-muted">It may have been deleted, or the link is wrong.</p>
+    <a class="btn btn-primary" routerLink="/">Back to boards</a>
+  </div>
+}

@@ -1,0 +1,119 @@
+<header class="column-header">
+  <button
+    type="button"
+    class="icon-btn sm drag-handle"
+    cdkDragHandle
+    aria-label="Drag to reorder column"
+    title="Drag to reorder"
+  >
+    <app-icon name="grip" [size]="16" />
+  </button>
+
+  @if (editingTitle()) {
+    <input
+      #titleInput
+      class="input title-input"
+      [value]="column().title"
+      maxlength="40"
+      aria-label="Column name"
+      appAutofocus
+      (keydown)="onRenameKeydown($event, titleInput)"
+      (blur)="finishRename(titleInput)"
+    />
+  } @else {
+    <h2 class="column-title" (dblclick)="startRename()">{{ column().title }}</h2>
+    <span
+      class="count"
+      [title]="filtered() ? 'Matching cards / all cards' : 'Cards in this column'"
+    >
+      @if (filtered()) {
+        {{ cards().length }}/{{ column().cards.length }}
+      } @else {
+        {{ column().cards.length }}
+      }
+    </span>
+  }
+
+  <button
+    type="button"
+    class="icon-btn sm column-menu"
+    aria-label="Column actions"
+    [cdkMenuTriggerFor]="columnMenu"
+  >
+    <app-icon name="more" [size]="16" />
+  </button>
+  <ng-template #columnMenu>
+    <div class="menu" cdkMenu>
+      <button type="button" class="menu-item" cdkMenuItem (cdkMenuItemTriggered)="openAddCard()">
+        <app-icon name="plus" [size]="16" /> Add card
+      </button>
+      <button type="button" class="menu-item" cdkMenuItem (cdkMenuItemTriggered)="startRename()">
+        <app-icon name="pencil" [size]="16" /> Rename column
+      </button>
+      <div class="menu-divider"></div>
+      <button
+        type="button"
+        class="menu-item danger"
+        cdkMenuItem
+        (cdkMenuItemTriggered)="requestDelete()"
+      >
+        <app-icon name="trash" [size]="16" /> Delete column
+      </button>
+    </div>
+  </ng-template>
+</header>
+
+<div
+  class="card-list"
+  cdkDropList
+  [id]="column().id"
+  [cdkDropListData]="column().id"
+  [cdkDropListConnectedTo]="connectedTo()"
+  (cdkDropListDropped)="onDrop($event)"
+>
+  @for (card of cards(); track card.id) {
+    <app-task-card
+      cdkDrag
+      [cdkDragData]="card"
+      [cdkDragStartDelay]="dragDelay"
+      [card]="card"
+      [boardLabels]="labels()"
+      [members]="members()"
+      [done]="done()"
+      (opened)="openCard($event)"
+    >
+      <div *cdkDragPlaceholder class="card-placeholder"></div>
+    </app-task-card>
+  } @empty {
+    <p class="empty">{{ filtered() ? 'No matching cards' : 'No cards yet' }}</p>
+  }
+</div>
+
+<footer class="column-footer">
+  @if (addingCard()) {
+    <div class="add-card-form">
+      <textarea
+        #newCard
+        class="textarea add-card-input"
+        rows="2"
+        maxlength="200"
+        placeholder="Card title, press Enter to add"
+        aria-label="New card title"
+        appAutofocus
+        (keydown)="onAddKeydown($event, newCard)"
+      ></textarea>
+      <div class="add-card-actions">
+        <button type="button" class="btn btn-primary btn-sm" (click)="submitCard(newCard)">
+          Add card
+        </button>
+        <button type="button" class="icon-btn sm" aria-label="Cancel" (click)="closeAddCard()">
+          <app-icon name="x" [size]="16" />
+        </button>
+      </div>
+    </div>
+  } @else {
+    <button type="button" class="add-card-btn" (click)="openAddCard()">
+      <app-icon name="plus" [size]="16" /> Add card
+    </button>
+  }
+</footer>
