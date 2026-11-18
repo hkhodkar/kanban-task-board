@@ -1,0 +1,157 @@
+<app-modal title="Card details" [width]="780" (closed)="requestClose()">
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <div class="modal-body dialog-grid">
+      <div class="main form-stack">
+        <div class="field">
+          <label for="card-title">Title</label>
+          <input
+            id="card-title"
+            class="input"
+            formControlName="title"
+            maxlength="200"
+            autocomplete="off"
+            cdkFocusInitial
+          />
+          @if (form.controls.title.invalid && form.controls.title.touched) {
+            <span class="field-error">A card needs a title.</span>
+          }
+        </div>
+
+        <div class="field">
+          <label for="card-description">Description</label>
+          <textarea
+            id="card-description"
+            class="textarea"
+            formControlName="description"
+            rows="5"
+            maxlength="2000"
+            placeholder="Add more details, links or acceptance criteria"
+          ></textarea>
+        </div>
+
+        <div class="field" formArrayName="checklist">
+          <div class="field-label checklist-header">
+            <span>Checklist</span>
+            @if (checklistTotal()) {
+              <span class="checklist-count">{{ checklistDone() }}/{{ checklistTotal() }}</span>
+            }
+          </div>
+
+          @if (checklistTotal()) {
+            <div class="checklist-progress" aria-hidden="true">
+              <span [style.width.%]="(checklistDone() / checklistTotal()) * 100"></span>
+            </div>
+          }
+
+          <ul class="checklist">
+            @for (item of checklist.controls; track item.value.id; let i = $index) {
+              <li class="checklist-item" [formGroupName]="i" [class.done]="item.value.done">
+                <input
+                  type="checkbox"
+                  class="checkbox"
+                  formControlName="done"
+                  [attr.aria-label]="'Mark item ' + (i + 1) + ' as done'"
+                />
+                <input
+                  class="input item-input"
+                  formControlName="text"
+                  maxlength="200"
+                  [attr.aria-label]="'Checklist item ' + (i + 1)"
+                />
+                <button
+                  type="button"
+                  class="icon-btn sm danger"
+                  aria-label="Remove item"
+                  (click)="removeItem(i)"
+                >
+                  <app-icon name="x" [size]="16" />
+                </button>
+              </li>
+            }
+          </ul>
+
+          <div class="add-item">
+            <input
+              class="input"
+              [formControl]="newItem"
+              maxlength="200"
+              placeholder="Add an item"
+              aria-label="New checklist item"
+              (keydown)="onNewItemKeydown($event)"
+            />
+            <button
+              type="button"
+              class="btn"
+              [disabled]="!newItem.value.trim()"
+              (click)="addItem()"
+            >
+              Add
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <aside class="side form-stack">
+        <div class="field">
+          <label for="card-column">Column</label>
+          <select id="card-column" class="select" formControlName="columnId">
+            @for (column of board().columns; track column.id) {
+              <option [value]="column.id">{{ column.title }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="card-assignee">Assignee</label>
+          <select id="card-assignee" class="select" formControlName="assigneeId">
+            <option value="">Unassigned</option>
+            @for (member of members(); track member.id) {
+              <option [value]="member.id">{{ member.name }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="field">
+          <div class="field-label due-header">
+            <label for="card-due">Due date</label>
+            @if (form.controls.dueDate.value) {
+              <button type="button" class="link-btn" (click)="clearDueDate()">Clear</button>
+            }
+          </div>
+          <input id="card-due" type="date" class="input" formControlName="dueDate" />
+        </div>
+
+        <div class="field">
+          <span class="field-label" id="labels-heading">Labels</span>
+          <div class="label-options" role="group" aria-labelledby="labels-heading">
+            @for (label of board().labels; track label.id) {
+              <button
+                type="button"
+                class="label-pill label-option"
+                [class]="'label-' + label.color"
+                [class.selected]="selectedLabels().includes(label.id)"
+                [attr.aria-pressed]="selectedLabels().includes(label.id)"
+                (click)="toggleLabel(label.id)"
+              >
+                @if (selectedLabels().includes(label.id)) {
+                  <app-icon name="check" [size]="12" />
+                }
+                {{ label.name }}
+              </button>
+            }
+          </div>
+        </div>
+
+        <p class="created">Created {{ createdLabel() }}</p>
+      </aside>
+    </div>
+
+    <footer class="modal-footer">
+      <button type="button" class="btn btn-danger-ghost delete-btn" (click)="requestDelete()">
+        <app-icon name="trash" [size]="16" /> Delete
+      </button>
+      <button type="button" class="btn" (click)="requestClose()">Cancel</button>
+      <button type="submit" class="btn btn-primary">Save changes</button>
+    </footer>
+  </form>
+</app-modal>

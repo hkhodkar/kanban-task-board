@@ -127,6 +127,18 @@
     </div>
   </div>
 
+  @if (selected(); as selected) {
+    <app-card-dialog
+      [board]="board"
+      [card]="selected.card"
+      [columnId]="selected.column.id"
+      [members]="members()"
+      (saved)="saveCard($event)"
+      (deleted)="deleteCard()"
+      (closed)="closeCard()"
+    />
+  }
+
   @if (editingBoard()) {
     <app-board-form-dialog
       [board]="board"

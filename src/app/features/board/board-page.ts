@@ -22,6 +22,7 @@ import { IconComponent } from '../../shared/ui/icon';
 import { ToastService } from '../../shared/ui/toast.service';
 import { BoardFormDialogComponent, BoardFormValue } from '../boards/board-form-dialog';
 import { BoardColumnComponent, DRAG_DELAY } from './board-column';
+import { CardDialogComponent, CardDialogResult } from './card-dialog';
 
 @Component({
   selector: 'app-board-page',
@@ -37,6 +38,7 @@ import { BoardColumnComponent, DRAG_DELAY } from './board-column';
     IconComponent,
     BoardColumnComponent,
     BoardFormDialogComponent,
+    CardDialogComponent,
   ],
   templateUrl: './board-page.html',
   styleUrl: './board-page.scss',
@@ -50,11 +52,17 @@ export class BoardPageComponent {
 
   /** route param */
   readonly boardId = input.required<string>();
+  /** query param with the id of the open card, so card links can be shared */
+  readonly card = input<string>();
 
   protected readonly dragDelay = DRAG_DELAY;
   protected readonly members = this.store.members;
   protected readonly board = computed(() => this.store.getBoard(this.boardId()));
   protected readonly columnIds = computed(() => this.board()?.columns.map((c) => c.id) ?? []);
+  protected readonly selected = computed(() => {
+    const cardId = this.card();
+    return cardId ? this.store.findCard(this.boardId(), cardId) : null;
+  });
   protected readonly addingColumn = signal(false);
   protected readonly editingBoard = signal(false);
 
@@ -120,8 +128,37 @@ export class BoardPageComponent {
   }
 
   protected openCard(cardId: string): void {
-    // card details are added in the next step
-    void cardId;
+    this.router.navigate([], { queryParams: { card: cardId }, queryParamsHandling: 'merge' });
+  }
+
+  protected closeCard(): void {
+    this.router.navigate([], { queryParams: { card: null }, queryParamsHandling: 'merge' });
+  }
+
+  protected saveCard(result: CardDialogResult): void {
+    const board = this.board();
+    const selected = this.selected();
+    if (!board || !selected) return;
+    this.store.updateCard(board.id, selected.card.id, result.changes);
+    if (result.columnId !== selected.column.id) {
+      const target = board.columns.find((column) => column.id === result.columnId);
+      this.store.moveCard(board.id, selected.card.id, result.columnId, target?.cards.length ?? 0);
+    }
+    this.closeCard();
+  }
+
+  protected deleteCard(): void {
+    const board = this.board();
+    const selected = this.selected();
+    if (!board || !selected) return;
+    const removed = this.store.deleteCard(board.id, selected.card.id);
+    this.closeCard();
+    if (removed) {
+      this.toast.show('Card deleted', {
+        actionLabel: 'Undo',
+        action: () => this.store.restoreCard(removed),
+      });
+    }
   }
 
   // Columns
