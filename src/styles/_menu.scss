@@ -1,0 +1,47 @@
+// Dropdown menus built on @angular/cdk/menu
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  min-width: 180px;
+  padding: 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  box-shadow: var(--shadow-lg);
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  height: 36px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+
+  &:hover,
+  &:focus {
+    outline: none;
+    background: var(--surface-muted);
+  }
+
+  &.danger {
+    color: var(--danger);
+
+    &:hover,
+    &:focus {
+      background: var(--danger-soft);
+    }
+  }
+}
+
+.menu-divider {
+  height: 1px;
+  margin: 6px 0;
+  background: var(--border);
+}

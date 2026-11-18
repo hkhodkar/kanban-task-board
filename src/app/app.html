@@ -1,0 +1,32 @@
+<header class="app-header">
+  <a class="brand" routerLink="/">
+    <span class="brand-logo"><app-icon name="board" [size]="18" /></span>
+    <span class="brand-name">Kanban<span class="brand-light"> Board</span></span>
+  </a>
+
+  <div class="header-actions">
+    <button
+      type="button"
+      class="icon-btn"
+      [attr.aria-label]="theme.isDark() ? 'Switch to light mode' : 'Switch to dark mode'"
+      [title]="theme.isDark() ? 'Light mode' : 'Dark mode'"
+      (click)="theme.toggle()"
+    >
+      <app-icon [name]="theme.isDark() ? 'sun' : 'moon'" />
+    </button>
+    <a
+      class="icon-btn"
+      href="https://github.com/hkhodkar/kanban-task-board"
+      target="_blank"
+      rel="noopener"
+      aria-label="Source code on GitHub"
+      title="Source code"
+    >
+      <app-icon name="github" />
+    </a>
+  </div>
+</header>
+
+<main class="app-main">
+  <router-outlet />
+</main>
