@@ -1,4 +1,13 @@
-import { ChangeDetectionStrategy, Component, inject, input, OnInit, output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  input,
+  OnInit,
+  output,
+} from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { BOARD_TEMPLATES, BoardTemplate } from '../../core/data/seed-data';
 import { Board } from '../../core/models/board.models';
@@ -39,9 +48,9 @@ export interface BoardFormValue {
           </div>
 
           <div class="field">
-            <label for="board-description"
-              >Description <span class="optional">(optional)</span></label
-            >
+            <label for="board-description">
+              Description <span class="optional">(optional)</span>
+            </label>
             <textarea
               id="board-description"
               class="textarea"
@@ -54,15 +63,18 @@ export interface BoardFormValue {
 
           @if (!board()) {
             <div class="field">
-              <label for="board-template">Columns</label>
-              <select id="board-template" class="select" formControlName="template">
+              <label for="board-template">Template</label>
+              <select
+                id="board-template"
+                class="select"
+                formControlName="template"
+                aria-describedby="template-columns"
+              >
                 @for (template of templates; track template.value) {
-                  <option [value]="template.value">
-                    {{ template.name
-                    }}{{ template.columns.length ? ' - ' + template.columns.join(', ') : '' }}
-                  </option>
+                  <option [value]="template.value">{{ template.name }}</option>
                 }
               </select>
+              <span class="hint" id="template-columns">{{ templateHint() }}</span>
             </div>
           }
         </div>
@@ -77,6 +89,11 @@ export interface BoardFormValue {
     </app-modal>
   `,
   styles: `
+    .hint {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
     .optional {
       font-weight: 400;
       opacity: 0.8;
@@ -95,6 +112,15 @@ export class BoardFormDialogComponent implements OnInit {
     name: ['', [Validators.required, Validators.maxLength(60)]],
     description: ['', Validators.maxLength(200)],
     template: ['scrum' as BoardTemplate],
+  });
+
+  private readonly template = toSignal(this.form.controls.template.valueChanges, {
+    initialValue: this.form.controls.template.value,
+  });
+
+  protected readonly templateHint = computed(() => {
+    const columns = this.templates.find((t) => t.value === this.template())?.columns ?? [];
+    return columns.length ? `Columns: ${columns.join(', ')}` : 'Start without columns';
   });
 
   ngOnInit(): void {
