@@ -38,7 +38,13 @@ export function hasActiveFilters(filters: CardFilters): boolean {
   );
 }
 
-export function matchesFilters(card: Card, filters: CardFilters, today = todayIso()): boolean {
+/** `done` marks cards in a done column, they never count as overdue. */
+export function matchesFilters(
+  card: Card,
+  filters: CardFilters,
+  today = todayIso(),
+  done = false,
+): boolean {
   const query = filters.search.trim().toLowerCase();
   if (
     query &&
@@ -60,7 +66,7 @@ export function matchesFilters(card: Card, filters: CardFilters, today = todayIs
 
   switch (filters.due) {
     case 'overdue':
-      return dueStatus(card, today) === 'overdue';
+      return !done && dueStatus(card, today) === 'overdue';
     case 'week': {
       // today plus the next six days
       if (!card.dueDate) return false;

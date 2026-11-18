@@ -5,6 +5,7 @@ import {
   effect,
   inject,
   input,
+  linkedSignal,
   signal,
 } from '@angular/core';
 import { Title } from '@angular/platform-browser';
@@ -12,9 +13,15 @@ import { Router, RouterLink } from '@angular/router';
 import { CdkDrag, CdkDragDrop, CdkDropList } from '@angular/cdk/drag-drop';
 import { CdkMenu, CdkMenuItem, CdkMenuTrigger } from '@angular/cdk/menu';
 import { CdkScrollable } from '@angular/cdk/scrolling';
-import { Board, Card, Column } from '../../core/models/board.models';
+import { Board, Card, CardFilters, Column, EMPTY_FILTERS } from '../../core/models/board.models';
 import { BoardStore } from '../../core/services/board-store';
-import { dueStatus, isDoneColumn, toFullIndex } from '../../core/utils/card.utils';
+import {
+  dueStatus,
+  hasActiveFilters,
+  isDoneColumn,
+  matchesFilters,
+  toFullIndex,
+} from '../../core/utils/card.utils';
 import { todayIso } from '../../core/utils/date.utils';
 import { AutofocusDirective } from '../../shared/directives/autofocus';
 import { ConfirmService } from '../../shared/ui/confirm.service';
@@ -22,6 +29,7 @@ import { IconComponent } from '../../shared/ui/icon';
 import { ToastService } from '../../shared/ui/toast.service';
 import { BoardFormDialogComponent, BoardFormValue } from '../boards/board-form-dialog';
 import { BoardColumnComponent, DRAG_DELAY } from './board-column';
+import { BoardFiltersComponent } from './board-filters';
 import { CardDialogComponent, CardDialogResult } from './card-dialog';
 
 @Component({
@@ -37,6 +45,7 @@ import { CardDialogComponent, CardDialogResult } from './card-dialog';
     AutofocusDirective,
     IconComponent,
     BoardColumnComponent,
+    BoardFiltersComponent,
     BoardFormDialogComponent,
     CardDialogComponent,
   ],
@@ -66,13 +75,30 @@ export class BoardPageComponent {
   protected readonly addingColumn = signal(false);
   protected readonly editingBoard = signal(false);
 
+  // filters start empty again whenever another board is opened
+  protected readonly filters = linkedSignal<string, CardFilters>({
+    source: this.boardId,
+    computation: () => EMPTY_FILTERS,
+  });
+  protected readonly filtering = computed(() => hasActiveFilters(this.filters()));
+
   protected readonly visibleCards = computed<Record<string, Card[]>>(() => {
+    const filters = this.filters();
+    const active = this.filtering();
+    const today = todayIso();
     const result: Record<string, Card[]> = {};
     for (const column of this.board()?.columns ?? []) {
-      result[column.id] = column.cards;
+      const done = isDoneColumn(column);
+      result[column.id] = active
+        ? column.cards.filter((card) => matchesFilters(card, filters, today, done))
+        : column.cards;
     }
     return result;
   });
+
+  protected readonly matchingCount = computed(() =>
+    Object.values(this.visibleCards()).reduce((sum, cards) => sum + cards.length, 0),
+  );
 
   protected readonly stats = computed(() => {
     const today = todayIso();
@@ -96,6 +122,10 @@ export class BoardPageComponent {
       const name = this.board()?.name ?? 'Board not found';
       title.setTitle(`${name} · Kanban Task Board`);
     });
+  }
+
+  protected setFilters(filters: CardFilters): void {
+    this.filters.set(filters);
   }
 
   // Cards

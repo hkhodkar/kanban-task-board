@@ -62,6 +62,16 @@
     </div>
   </header>
 
+  <app-board-filters
+    class="filter-bar"
+    [filters]="filters()"
+    [labels]="board.labels"
+    [members]="members()"
+    [matching]="matchingCount()"
+    [total]="stats().total"
+    (filtersChange)="setFilters($event)"
+  />
+
   <div class="board-scroller" cdkScrollable>
     <div
       class="columns"
@@ -80,6 +90,7 @@
           [labels]="board.labels"
           [members]="members()"
           [connectedTo]="columnIds()"
+          [filtered]="filtering()"
           (cardDropped)="onCardDrop($event)"
           (cardOpened)="openCard($event)"
           (cardAdded)="addCard(column, $event)"

@@ -72,6 +72,11 @@ describe('matchesFilters', () => {
     expect(ids({ due: 'none' })).toEqual([]);
   });
 
+  it('never treats cards in a done column as overdue', () => {
+    const filters = { ...EMPTY_FILTERS, due: 'overdue' as const };
+    expect(matchesFilters(cards[0], filters, TODAY, true)).toBe(false);
+  });
+
   it('combines filters', () => {
     expect(ids({ search: 'docs', assigneeId: 'm-1' })).toEqual([]);
     expect(hasActiveFilters({ ...EMPTY_FILTERS, due: 'overdue' })).toBe(true);

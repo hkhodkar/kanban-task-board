@@ -1,0 +1,60 @@
+<form class="filters" [formGroup]="form" role="search" (submit)="$event.preventDefault()">
+  <div class="search">
+    <app-icon name="search" [size]="16" />
+    <input
+      class="input"
+      type="search"
+      formControlName="search"
+      placeholder="Search cards"
+      aria-label="Search cards"
+      autocomplete="off"
+    />
+  </div>
+
+  <button
+    type="button"
+    class="btn toggle-btn"
+    [class.is-open]="expanded()"
+    [attr.aria-expanded]="expanded()"
+    (click)="toggleExpanded()"
+  >
+    <app-icon name="filter" [size]="16" />
+    Filters
+    @if (selectCount()) {
+      <span class="toggle-count">{{ selectCount() }}</span>
+    }
+  </button>
+
+  <div class="selects" [class.open]="expanded()">
+    <select class="select" formControlName="labelId" aria-label="Filter by label">
+      <option value="">All labels</option>
+      @for (label of labels(); track label.id) {
+        <option [value]="label.id">{{ label.name }}</option>
+      }
+    </select>
+
+    <select class="select" formControlName="assigneeId" aria-label="Filter by assignee">
+      <option value="">Anyone</option>
+      <option value="unassigned">Unassigned</option>
+      @for (member of members(); track member.id) {
+        <option [value]="member.id">{{ member.name }}</option>
+      }
+    </select>
+
+    <select class="select" formControlName="due" aria-label="Filter by due date">
+      <option value="all">Any due date</option>
+      <option value="overdue">Overdue</option>
+      <option value="week">Due this week</option>
+      <option value="none">No due date</option>
+    </select>
+  </div>
+
+  @if (active()) {
+    <div class="result">
+      <span>{{ matching() }} of {{ total() }} cards</span>
+      <button type="button" class="btn btn-ghost btn-sm" (click)="clear()">
+        <app-icon name="x" [size]="14" /> Clear filters
+      </button>
+    </div>
+  }
+</form>

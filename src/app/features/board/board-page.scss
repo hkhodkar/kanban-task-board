@@ -58,6 +58,11 @@
   gap: 8px;
 }
 
+.filter-bar {
+  display: block;
+  padding: 0 24px 16px;
+}
+
 .board-scroller {
   display: flex;
   flex: 1;
@@ -145,6 +150,10 @@ app-board-column.cdk-drag-placeholder {
 
   .title-row h1 {
     font-size: 19px;
+  }
+
+  .filter-bar {
+    padding: 0 16px 12px;
   }
 
   .board-scroller {
