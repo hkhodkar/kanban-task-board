@@ -214,7 +214,7 @@ input[type='date'].input {
   font-weight: 600;
   line-height: 18px;
   white-space: nowrap;
-  color: var(--label);
+  color: color-mix(in srgb, var(--label), #fff var(--label-text-tint));
   background: color-mix(in srgb, var(--label) var(--label-text-alpha), transparent);
 }
 
